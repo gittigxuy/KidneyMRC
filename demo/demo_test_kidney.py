@@ -106,6 +106,65 @@ def resize_restore(img, resize_info):
 
     return img
 
+def evaluate(correct_label,label):
+    average = 0
+    correct = 0
+    wrong = 0
+
+    if correct_label==label:
+        correct += 1
+    else:
+        wrong += 1
+    sum = correct+wrong
+    average = (correct/sum)
+    print('sum',sum)
+    print('average', average)
+    return average
+
+
+class Acc_meter:
+    def __init__(self):
+        self.eval_list = []
+
+    def update(self, correct_label, evel_label):
+        self.eval_list.append([correct_label, evel_label])
+
+    def get_acc(self):
+        correct = 0
+        wrong = 0
+
+        for correct_label, evel_label in self.eval_list:
+            if correct_label == evel_label:
+                correct += 1
+            else:
+                wrong += 1
+
+        return correct / (correct + wrong)
+
+    def get_class_acc(self):
+
+        correct_wrong_dict = dict()
+        for correct_label, evel_label in self.eval_list:
+            if correct_label not in correct_wrong_dict:
+                correct_wrong_dict[correct_label] = [0, 0]
+
+            if correct_label == evel_label:
+                correct_wrong_dict[correct_label][0] += 1
+            else:
+                correct_wrong_dict[correct_label][1] += 1
+
+        label_acc = []
+
+        labels = list(correct_wrong_dict.keys())
+        labels.sort()
+
+        for label in labels:
+            correct, wrong = correct_wrong_dict[label]
+            acc = correct / (correct + wrong)
+            label_acc.append([label, acc])
+
+        return label_acc
+
 
 def main(dir_path=None, config_file=None, model_file=None, save_dir=None):
     dir_path = norm_path(dir_path) if dir_path else None
@@ -130,7 +189,10 @@ def main(dir_path=None, config_file=None, model_file=None, save_dir=None):
         min_image_size=512,
         confidence_threshold=0.3,
     )
-    
+
+    class_names = ['', 'AKI', 'CKD', 'normal']
+
+    acc_meter = Acc_meter()
     for filePath in image_list(dir_path):
 
         print('file_path', filePath)
@@ -141,6 +203,20 @@ def main(dir_path=None, config_file=None, model_file=None, save_dir=None):
 
         #find label high score
         result, crops, masks, labels = kidney_demo.detection(img)
+        top_label = labels[0]
+
+        #find diagnosis in directory, it will be used as an correct answer
+        path = os.path.split(filePath)[0]
+        diagnosis, accno = path.split('/')[-2:]
+        #convert diagnosis to int(because labels is integer)
+
+        diag_class_no = class_names.index(diagnosis)
+
+        # print(diagnosis)
+        # print(top_label)
+
+        # evaluate(diagnosis,top_label)
+        acc_meter.update(diag_class_no, top_label)
 
         # restore size of image to original size
         result = resize_restore(result, resize_info)
@@ -167,6 +243,10 @@ def main(dir_path=None, config_file=None, model_file=None, save_dir=None):
                     cv2.imwrite(save_file, mask)
 
 
+    print('acc:{:3.2f}'.format(acc_meter.get_acc()))
+    for class_num, class_acc in acc_meter.get_class_acc():
+        print('class {} acc {:3.2f}'.format(class_num, class_acc * 100))
+
 if __name__ == '__main__':
 
     # config_file = "../configs/e2e_mask_rcnn_X_101_32x8d_FPN_1x_kidney.yaml"
@@ -181,8 +261,8 @@ if __name__ == '__main__':
 
     # all save path
     config_file = "../configs/e2e_mask_rcnn_X_101_32x8d_FPN_1x_kidney_using_pretrained_model.yaml"
-    dir_path = "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/US_kidney_original_one/train"
-    model_file = "/home/bong6/lib/KidneyProject/checkpoint/kidney_using_pretrained_model/model_0002500.pth"
+    dir_path = "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/US_kidney_original_one/val"
+    model_file = "/home/bong6/lib/KidneyProject/checkpoint/kidney_using_pretrained_model/model_0010000.pth"
     save_dir = '/home/bong6/kidney_result'
 
 

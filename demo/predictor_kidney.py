@@ -11,11 +11,12 @@ from maskrcnn_benchmark import layers as L
 
 
 class KidneyDemo(object):
-    # COCO categories for pretty print
+    # 1.aki = 급성 2.ckd = 만성 3.normal = 정상
     CATEGORIES = [
-        "__background",
-        "kidney",
-        "bg"
+        "__background__ ",
+        "AKI",
+        "CKD",
+        "normal"
     ]
 
     def __init__(
