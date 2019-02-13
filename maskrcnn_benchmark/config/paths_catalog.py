@@ -88,33 +88,14 @@ class DatasetCatalog(object):
             "img_dir": "cityscapes/images",
             "ann_file": "cityscapes/annotations/instancesonly_filtered_gtFine_test.json"
         },
-        "kidney_isangmi_400+100+1200_withExcluded_train": {
-            "img_dir": "yonsei2/dataset/US_isangmi_400+100+1200_withExcluded/train",
-            "mask_dir": "yonsei2/dataset/SegMrcnn_20190108"
+        "kidney_train": {
+            "img_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/US_kidney_original_one/train",
+            "mask_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/SegKidney_v3"
         },
-        "kidney_isangmi_400+100+1200_withExcluded_val": {
-            "img_dir": "yonsei2/dataset/US_isangmi_400+100+1200_withExcluded/val",
-            "mask_dir": "yonsei2/dataset/SegMrcnn_20190108"
-        },
-
-
-
-
-
-        "kidney_isangmi_400+100+1200_withExcluded_train": {
-            "img_dir": "yonsei2/dataset/US_isangmi_400+100+1200_withExcluded/train",
-            "mask_dir": "yonsei2/dataset/SegMrcnn_20190108"
-        },
-        "kidney_isangmi_400+100+1200_withExcluded_val": {
-            "img_dir": "yonsei2/dataset/US_isangmi_400+100+1200_withExcluded/val",
-            "mask_dir": "yonsei2/dataset/SegMrcnn_20190108"
+        "kidney_val": {
+            "img_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/US_kidney_original_one/val",
+            "mask_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/SegKidney_v3"
         }
-
-
-
-
-
-
     }
 
     @staticmethod
@@ -167,7 +148,6 @@ class DatasetCatalog(object):
                 args=args,
             )
         raise RuntimeError("Dataset not available: {}".format(name))
-
 
 class ModelCatalog(object):
     S3_C2_DETECTRON_URL = "https://dl.fbaipublicfiles.com/detectron"

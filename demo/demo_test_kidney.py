@@ -128,11 +128,9 @@ def main(dir_path=None, config_file=None, model_file=None, save_dir=None):
     kidney_demo = KidneyDemo(
         cfg,
         min_image_size=512,
-        confidence_threshold=0.7,
+        confidence_threshold=0.3,
     )
-
-    kidney_label = 1
-
+    
     for filePath in image_list(dir_path):
 
         print('file_path', filePath)
@@ -140,6 +138,8 @@ def main(dir_path=None, config_file=None, model_file=None, save_dir=None):
 
         # resize image for input size of model
         img, resize_info = resize_aspect_ratio(img, (512, 512))
+
+        #find label high score
         result, crops, masks, labels = kidney_demo.detection(img)
 
         # restore size of image to original size
@@ -155,8 +155,6 @@ def main(dir_path=None, config_file=None, model_file=None, save_dir=None):
         # if found object, make corp and mask image
         if len(labels) > 0:
             for crop, mask, label in zip(crops, masks, labels):
-                if label != kidney_label:
-                    continue
 
                 if save_crop_dir:
                     save_file = os.path.join(save_crop_dir, fileName(filePath))
@@ -181,10 +179,11 @@ if __name__ == '__main__':
     # model_file = "/home/bong07/lib/robin_mrcnn/checkpoint/kidney_using_pretrained_model/model_0180000.pth"
     # save_dir = '../result/kidney_using_pretrained_model_model_0180000'
 
+    # all save path
     config_file = "../configs/e2e_mask_rcnn_X_101_32x8d_FPN_1x_kidney_using_pretrained_model.yaml"
-    dir_path = "/media/bong07/895GB/work_1200_mask/non-mask/180917_KidneyUS_1200_png_human_seg"
-    model_file = "/home/bong07/lib/robin_mrcnn/checkpoint/kidney_using_pretrained_model/model_0165000.pth"
-    save_dir = '/media/bong07/895GB/work_1200_mask/non-mask/mrcnn_mask_pretrain_model_0165000'
+    dir_path = "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/US_kidney_original_one/train"
+    model_file = "/home/bong6/lib/KidneyProject/checkpoint/kidney_using_pretrained_model/model_0002500.pth"
+    save_dir = '/home/bong6/kidney_result'
 
 
 

@@ -16,7 +16,7 @@ import torch
 
 sys.path.insert(0, '../')
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 from maskrcnn_benchmark.config import cfg
 from maskrcnn_benchmark.data import make_data_loader
@@ -35,7 +35,7 @@ from tensorboardX import SummaryWriter
 
 
 def last_checkpoint(save_path):
-    last_checkpoint_log =  os.path.join(save_path, 'last_checkpoint')
+    last_checkpoint_log = os.path.join(save_path, 'last_checkpoint')
 
     if os.path.exists(last_checkpoint_log):
         with open(last_checkpoint_log, 'rt') as f:

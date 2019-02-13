@@ -19,10 +19,11 @@ import matplotlib.pyplot as plt
 # ~/lib/robin_mrcnn/maskrcnn_benchmark/config/paths_catalog.py 에 지정한 Factory로 참조가 가능해짐
 
 class Kidney1Dataset(torch.utils.data.Dataset):
+    # 1.aki = 급성 2.ckd = 만성 3.normal = 정상
     CLASSES = (
-        "__background__ ",
-        "kidney",
-        "bg"  # 유사 신장을 위한 클래스로 신장 클래스의 분류 정확도에 향상에 중요
+        "aki",
+        "ckd",
+        "normal"
     )
 
     def __init__(self, mask_dir=None, root=None, mask_type=None, transforms=None, is_train=True):

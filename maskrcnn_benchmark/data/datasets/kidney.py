@@ -19,10 +19,12 @@ import matplotlib.pyplot as plt
 # ~/lib/robin_mrcnn/maskrcnn_benchmark/config/paths_catalog.py 에 지정한 Factory로 참조가 가능해짐
 
 class KidneyDataset(torch.utils.data.Dataset):
+    # 1.aki = 급성 2.ckd = 만성 3.normal = 정상
     CLASSES = (
         "__background__ ",
-        "kidney",
-        "bg"  # 유사 신장을 위한 클래스로 신장 클래스의 분류 정확도에 향상에 중요
+        "AKI",
+        "CKD",
+        "normal"
     )
 
     def __init__(self, mask_dir=None, root=None, mask_type=None, transforms=None, is_train=True):
@@ -49,19 +51,28 @@ class KidneyDataset(torch.utils.data.Dataset):
         cls = KidneyDataset.CLASSES
         self.class_to_ind = dict(zip(cls, range(len(cls))))
 
+        # img_dict는 이미지 파일 이름을 키로 하고 파일의 전체경로를 값으로 한다
         self.img_dict = image_dict(root, exts=['.png', '.jpg', '.jpeg'], recursive=True, followlinks=True)
+        # for cls_num, cls_name in enumerate(self.CLASSES[1:], 1):
+            # cls_mask_path = os.path.join(mask_dir, cls_name)
+            # assert os.path.exists(cls_mask_path), "Not found class({}) path: {}".format(cls, cls_mask_path)
 
-        for cls_num, cls_name in enumerate(self.CLASSES[1:], 1):
-            cls_mask_path = os.path.join(mask_dir, cls_name)
-            assert os.path.exists(cls_mask_path), "Not found class({}) path: {}".format(cls, cls_mask_path)
+        mask_dict = image_dict(mask_dir)
 
-            mask_dict = image_dict(cls_mask_path)
-            for mask_key, mask_file in mask_dict.items():
-                if mask_key not in self.ann_info:
-                    self.ann_info[mask_key] = list()
-                # x, y, w, h = None, None, None, None
-                # self.ann_info[mask_key].append([x, y, w, h, cls_num, mask_file])
-                self.ann_info[mask_key].append([cls_num, mask_file])
+        for mask_key, mask_file in mask_dict.items():
+            if mask_key not in self.ann_info:
+                self.ann_info[mask_key] = list()
+
+            if mask_key not in self.img_dict:
+                continue
+
+            us_img_path = self.img_dict[mask_key]
+            us_img_path = os.path.split(us_img_path)[0]
+            cls_name, acc_no = us_img_path.split('/')[-2:]
+            cls_num = self.CLASSES.index(cls_name)
+
+            self.ann_info[mask_key].append([cls_num, mask_file])
+            # print(cls_num, mask_file)
 
         self.img_key_list = list(set(self.img_dict) & set(self.ann_info))
         print('found images', len(self.img_dict))
@@ -69,7 +80,7 @@ class KidneyDataset(torch.utils.data.Dataset):
         print('using image&mask', len(self.img_key_list))
 
         self.train_augmentation = iaa.Sequential([
-            iaa.PiecewiseAffine(scale=(0.00, 0.05), nb_cols=3, nb_rows=3),
+            # iaa.PiecewiseAffine(scale=(0.00, 0.05), nb_cols=3, nb_rows=3),
             iaa.Affine(rotate=(-20, 20)),
             iaa.SomeOf((0, None), [
                 iaa.Fliplr(0.5),
