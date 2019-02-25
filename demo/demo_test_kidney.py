@@ -262,7 +262,7 @@ if __name__ == '__main__':
     # all save path
     config_file = "../configs/e2e_mask_rcnn_X_101_32x8d_FPN_1x_kidney_using_pretrained_model.yaml"
     dir_path = "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/US_kidney_original_one/val"
-    model_file = "/home/bong6/lib/KidneyProject/checkpoint/kidney_using_pretrained_model/model_0010000.pth"
+    model_file = "/home/bong6/lib/KidneyProject/checkpoint/kidney_using_pretrained_model/model_0010500.pth"
     save_dir = '/home/bong6/kidney_result'
 
 
