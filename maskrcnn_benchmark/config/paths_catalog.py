@@ -5,7 +5,7 @@ import os
 
 
 class DatasetCatalog(object):
-    DATA_DIR = "/home/bong07/data"
+    DATA_DIR = "/home/bong06/data"
     DATASETS = {
         "coco_2014_train": {
             "img_dir": "coco/train2014",
@@ -89,12 +89,20 @@ class DatasetCatalog(object):
             "ann_file": "cityscapes/annotations/instancesonly_filtered_gtFine_test.json"
         },
         "kidney_train": {
-            "img_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/US_kidney_original_one/train",
-            "mask_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/SegKidney_v3"
+            "img_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/SegMrcn_04_19/us/train",
+            "mask_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/SegMrcn_04_19/seg"
         },
         "kidney_val": {
-            "img_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/US_kidney_original_one/val",
-            "mask_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/SegKidney_v3"
+            "img_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/SegMrcn_04_19/us/val",
+            "mask_dir": "/media/bong6/602b5e26-f5c0-421c-b8a5-08c89cd4d4e6/data/yonsei2/dataset/SegMrcn_04_19/seg"
+        },
+        "liver_kidney_train": {
+            "img_dir": "/home/bong6/data/SegMrcnn_kidney_liver_some_400_20190329_re/us/train",
+            "mask_dir": "/home/bong6/data/SegMrcnn_kidney_liver_some_400_20190329_re/seg"
+        },
+        "liver_kidney_val":{
+            "img_dir":"/home/bong6/data/SegMrcnn_kidney_liver_some_400_20190329_re/us/val",
+            "mask_dir":"/home/bong6/data/SegMrcnn_kidney_liver_some_400_20190329_re/seg"
         }
     }
 
@@ -145,6 +153,18 @@ class DatasetCatalog(object):
             )
             return dict(
                 factory="KidneyDataset",
+                args=args,
+            )
+        elif "liver_kidney" in name:
+            data_dir = DatasetCatalog.DATA_DIR
+            attrs = DatasetCatalog.DATASETS[name]
+            args = dict(
+                root=os.path.join(data_dir, attrs["img_dir"]),
+                mask_dir=os.path.join(data_dir, attrs["mask_dir"]),
+                mask_type="image"
+            )
+            return dict(
+                factory="Liver_KidneyDataset",
                 args=args,
             )
         raise RuntimeError("Dataset not available: {}".format(name))

@@ -17,14 +17,15 @@ import matplotlib.pyplot as plt
 # 이 파일과 같은 새로운 데이터로더 클래스 추가후에는
 # ~/lib/robin_mrcnn/maskrcnn_benchmark/data/datasets/__init__.py 파일에 등록을 해야만
 # ~/lib/robin_mrcnn/maskrcnn_benchmark/config/paths_catalog.py 에 지정한 Factory로 참조가 가능해짐
+# 이재인변경(2019_04_09) 간하고 bg 클래스 신장 클래스
 
-class KidneyDataset(torch.utils.data.Dataset):
-    # 1.aki = 급성 2.ckd = 만성 3.normal = 정상
+class Liver_KidneyDataset(torch.utils.data.Dataset):
+    # 1.liver = 간 2.kidney = 신장  3. bg = 신장인지 간인지 모르겠음
     CLASSES = (
         "__background__ ",
-        "AKI",
-        "CKD",
-        "normal"
+        "liver",
+        "kidney",
+        "bg"
     )
 
     def __init__(self, mask_dir=None, root=None, mask_type=None, transforms=None, is_train=True):
@@ -39,6 +40,7 @@ class KidneyDataset(torch.utils.data.Dataset):
         # norm path
         root = norm_path(root)
         mask_dir = norm_path(mask_dir)
+
         self.mask_type = 'polygon'  # mask_type
         self.transforms = transforms
         self.image_size = 512
@@ -47,7 +49,7 @@ class KidneyDataset(torch.utils.data.Dataset):
         self.img_dict = dict()
         self.ann_info = dict()
 
-        cls = KidneyDataset.CLASSES
+        cls = Liver_KidneyDataset.CLASSES
         self.class_to_ind = dict(zip(cls, range(len(cls))))
 
         # img_dict는 이미지 파일 이름을 키로 하고 파일의 전체경로를 값으로 한다
@@ -61,6 +63,7 @@ class KidneyDataset(torch.utils.data.Dataset):
         for mask_key, mask_file in mask_dict.items():
             if mask_key not in self.ann_info:
                 self.ann_info[mask_key] = list()
+
             if mask_key not in self.img_dict:
                 continue
 
@@ -70,6 +73,7 @@ class KidneyDataset(torch.utils.data.Dataset):
             cls_num = self.CLASSES.index(cls_name)
 
             self.ann_info[mask_key].append([cls_num, mask_file])
+            # print(cls_num, mask_file)
 
         self.img_key_list = list(set(self.img_dict) & set(self.ann_info))
         print('found images', len(self.img_dict))
@@ -218,22 +222,6 @@ class KidneyDataset(torch.utils.data.Dataset):
         new_im = cv2.copyMakeBorder(im, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)
 
         return new_im
-
-
-    # def get_image_polygons(self, mask):
-    #     _, contours, hierarchy = cv2.findContours(
-    #         mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
-    #     )
-    #     return 0
-    #
-    # def get_img_info(self, index):
-    #     return {"height": 512, "width": 512}
-    #
-    # def map_class_id_to_class_name(self, class_id):
-    #     return KidneyDataset.CLASSES[class_id]
-
-
-# util functions
 
 
 def norm_path(path, makedirs=False):
